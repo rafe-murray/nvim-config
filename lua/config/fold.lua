@@ -1,0 +1,9 @@
+-- vim.o.foldmethod = "indent"
+-- vim.api.nvim_create_autocmd("BufWinEnter", {
+--   desc = "Load saved folds",
+--   command = "loadview",
+-- })
+-- vim.api.nvim_create_autocmd("BufWinLeave", {
+--   desc = "Save current folds",
+--   command = "mkview",
+-- })
