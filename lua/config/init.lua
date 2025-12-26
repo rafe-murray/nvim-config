@@ -14,9 +14,10 @@ vim.g.signcolumn = "yes"
 vim.o.splitbelow = true
 vim.o.splitright = true
 
--- Grep options
+-- Grep options; these are set by default when ripgrep is installed but are also
+-- set explicitly here
 vim.o.grepformat = "%f:%l:%c:%m"
-vim.o.grepprg = "rg --vimgrep"
+vim.o.grepprg = "rg --vimgrep -uu"
 -- Uncomment for wrapped text
 -- vim.g.breakindent = true
 -- vim.g.wrap = true
@@ -64,10 +65,11 @@ vim.diagnostic.config({
   },
   severity_sort = true,
 })
-vim.o.cursorline = true
+vim.o.cursorline = false
+vim.opt.guicursor = ""
 vim.o.ignorecase = true
 vim.o.smartcase = true
--- Decrease update time
+-- Decrease update time for swap file
 vim.o.updatetime = 250
 vim.o.list = true
 vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
@@ -79,7 +81,6 @@ require("config/fold")
 
 local default_on_attach = vim.lsp.config["clangd"].on_attach or {}
 vim.lsp.config("clangd", {
-  filetypes = { "cpp", "objc", "objcpp", "cuda" },
   on_attach = function(client, bufnr)
     default_on_attach(client, bufnr)
     vim.keymap.set("n", "<leader>h", function()
@@ -87,14 +88,29 @@ vim.lsp.config("clangd", {
     end, { desc = "Switch source and header (Clangd)" })
   end,
 })
+vim.lsp.config("lua_ls", {
+  settings = {
+    Lua = {
+      workspace = {
+        library = { ["/Users/rafe/.hammerspoon/Spoons/EmmyLua.spoon/annotations"] = true },
+      },
+    },
+  },
+})
 vim.lsp.config("pyright", {
   root_markers = {
     "pyrightconfig.json",
     ".git",
   },
 })
-vim.lsp.enable("clangd_mips")
-vim.lsp.config("bashls", {
-  filetypes = { "bash", "dockerfile" },
+
+-- Add autocmd to remove everything that takes up the left margin on man pages
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "man",
+  callback = function()
+    vim.opt_local.signcolumn = "no"
+    vim.o.number = false
+    vim.o.relativenumber = false
+    vim.o.foldcolumn = "0"
+  end,
 })
-vim.g.c_syntax_for_h = true
