@@ -129,7 +129,6 @@ return {
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
-        clangd_mips = {},
         clangd = {},
         -- gopls = {},
         -- pyright = {},
@@ -246,26 +245,79 @@ return {
     },
   },
   {
-    "dhananjaylatkar/cscope_maps.nvim",
-    dependencies = {
-      "nvim-telescope/telescope.nvim", -- optional [for picker="telescope"]
-      "ibhagwan/fzf-lua", -- optional [for picker="fzf-lua"]
-      "echasnovski/mini.pick", -- optional [for picker="mini-pick"]
-      "folke/snacks.nvim", -- optional [for picker="snacks"]
-    },
-    opts = {
-      picker = "fzf-lua",
-      skip_picker_for_single_result = true,
-      skip_input_prompt = true,
-      project_rooter = {
-        enable = true,
-        -- change cwd to where db_file is located
-        change_cwd = false, -- "true" or "false"
-      },
-    },
-  },
-  {
     "aklt/plantuml-syntax",
     config = function() end,
+  },
+  {
+    "nvim-flutter/flutter-tools.nvim",
+    lazy = false,
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "stevearc/dressing.nvim", -- optional for vim.ui.select
+    },
+    config = function()
+      require("flutter-tools").setup({})
+      local map = function(lhs, rhs, desc)
+        vim.keymap.set("n", lhs, rhs, { desc = desc })
+      end
+      map("<leader>fr", "<cmd>FlutterRun<CR>", "Run the current project")
+      map("<leader>fd", "<cmd>FlutterDebug<CR>", " Force run current project in debug mode.")
+      map("<leader>fld", "<cmd>FlutterDevices<CR>", " Brings up a list of connected devices to select from.")
+      map(
+        "<leader>fle",
+        "<cmd>FlutterEmulators<CR>",
+        " Similar to devices but shows a list of emulators to choose from."
+      )
+      map("<leader>fpr", "<cmd>FlutterReload<CR>", " Reload the running project.")
+      map("<leader>fpR", "<cmd>FlutterRestart<CR>", " Restart the current project.")
+      map("<leader>fq", "<cmd>FlutterQuit<CR>", " Ends a running session.")
+      map("<leader>fa", "<cmd>FlutterAttach<CR>", " Attach to a running app.")
+      map(
+        "<leader>fD",
+        "<cmd>FlutterDetach<CR>",
+        " Ends a running session locally but keeps the process running on the device."
+      )
+      map(
+        "<leader>to",
+        "<cmd>FlutterOutlineToggle<CR>",
+        " Toggle the outline window showing the widget tree for the given file."
+      )
+      map(
+        "<leader>fo",
+        "<cmd>FlutterOutlineOpen<CR>",
+        " Opens an outline window showing the widget tree for the given file."
+      )
+      map("<leader>fts", "<cmd>FlutterDevTools<CR>", " Starts a Dart Dev Tools server.")
+      map("<leader>fta", "<cmd>FlutterDevToolsActivate<CR>", " Activates a Dart Dev Tools server.")
+      map(
+        "<leader>fu",
+        "<cmd>FlutterCopyProfilerUrl<CR>",
+        " Copies the profiler url to your system clipboard (+ register). Note that commands FlutterRun and FlutterDevTools must be executed first."
+      )
+      map(
+        "<leader>fL",
+        "<cmd>FlutterLspRestart<CR>",
+        " This command restarts the dart language server, and is intended for situations where it begins to work incorrectly."
+      )
+      map("grs", "<cmd>FlutterSuper<CR>", " Go to super class, method using custom LSP method dart/textDocument/super.")
+      map("gR", "<cmd>FlutterReanalyze<CR>", " Forces LSP server reanalyze using custom LSP method dart/reanalyze.")
+      map(
+        "grn",
+        "<cmd>FlutterRename<CR>",
+        " Renames and updates imports if lsp.settings.renameFilesWithClasses == always"
+      )
+      map("<leader>fc", "<cmd>FlutterLogClear<CR>", " Clears the log buffer.")
+      map("<leader>tfl", "<cmd>FlutterLogToggle<CR>", " Toggles the log buffer.")
+    end,
+  },
+  {
+    "esmuellert/nvim-eslint",
+    opts = {},
+  },
+  {
+    "nvim-neorg/neorg",
+    lazy = false, -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
+    version = "*", -- Pin Neorg to the latest stable release
+    config = true,
   },
 }
