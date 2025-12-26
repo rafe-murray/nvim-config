@@ -148,6 +148,7 @@ return {
       end,
     },
   },
+  { "akinsho/git-conflict.nvim", version = "*", config = true },
   { -- Fuzzy Finder (files, lsp, etc)
     "nvim-telescope/telescope.nvim",
     event = "VimEnter",
