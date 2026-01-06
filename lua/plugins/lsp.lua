@@ -320,4 +320,7 @@ return {
     version = "*", -- Pin Neorg to the latest stable release
     config = true,
   },
+  {
+    "b0o/schemastore.nvim",
+  },
 }
