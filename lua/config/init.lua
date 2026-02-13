@@ -139,3 +139,5 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.o.foldcolumn = "0"
   end,
 })
+
+vim.o.termguicolors = true
