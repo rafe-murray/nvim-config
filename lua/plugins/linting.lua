@@ -104,7 +104,11 @@ return {
       events = { "BufWritePost", "BufReadPost", "InsertLeave" },
     },
     config = function(_, opts)
-      require("lint").linters_by_ft = {}
+      vim.env.ESLINT_D_PPID = vim.fn.getpid()
+      require("lint").linters_by_ft = {
+        docker = { "hadolint" },
+        typescript = { "eslint_d" },
+      }
       local M = {}
       function M.lint()
         local lint = require("lint")
@@ -124,12 +128,21 @@ return {
   {
     "stevearc/conform.nvim",
     opts = {
+      formatters = {
+        taplo = {
+          append_args = { "--option", "indent_tables=true", "--option", "indent_entries=true" },
+        },
+      },
       formatters_by_ft = {
         lua = { "stylua" },
         typescript = { "prettier" },
         javascript = { "prettier" },
         markdown = { "prettier" },
         xml = { "xmlformat" },
+        cmake = { "cmake_format" },
+        tex = { "tex-fmt" },
+        toml = { "taplo" },
+        ["*"] = { "injected" },
       },
       format_on_save = {
         lsp_format = "fallback",
