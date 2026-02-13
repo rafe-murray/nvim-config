@@ -34,4 +34,12 @@ return {
       require("alpha").setup(require("alpha.themes.dashboard").config)
     end,
   },
+  {
+    "norcalli/nvim-colorizer.lua",
+    opts = {
+      "css",
+      "lua",
+    },
+    event = "BufEnter",
+  },
 }
