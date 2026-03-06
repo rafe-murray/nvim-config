@@ -1,3 +1,4 @@
+local keymaps = require("config.keymaps")
 return {
   {
     "mason-org/mason.nvim",
@@ -25,53 +26,9 @@ return {
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
         callback = function(event)
-          -- NOTE: Remember that Lua is a real programming language, and as such it is possible
-          -- to define small helper and utility functions so you don't have to repeat yourself.
-          --
-          -- In this case, we create a function that lets us more easily define mappings specific
-          -- for LSP related items. It sets the mode, buffer and description for us each time.
-          local map = function(keys, func, desc, mode)
-            mode = mode or "n"
-            vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+          for _, key in pairs(keymaps.lsp) do
+            keymaps.map(key)
           end
-          local builtin = require("telescope.builtin")
-
-          -- Rename the variable under your cursor.
-          --  Most Language Servers support renaming across files, etc.
-          map("grn", vim.lsp.buf.rename, "Rename")
-
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
-          map("gra", vim.lsp.buf.code_action, "Code Action", { "n", "x" })
-
-          -- Find references for the word under your cursor.
-          map("grr", builtin.lsp_references, "Goto References")
-
-          -- Jump to the implementation of the word under your cursor.
-          --  Useful when your language has ways of declaring types without an actual implementation.
-          map("gri", builtin.lsp_implementations, "Goto Implementation")
-
-          -- Jump to the definition of the word under your cursor.
-          --  This is where a variable was first declared, or where a function is defined, etc.
-          --  To jump back, press <C-t>.
-          map("gd", builtin.lsp_definitions, "Goto Definition")
-
-          -- This is not Goto Definition, this is Goto Declaration.
-          --  For example, in C this would take you to the header.
-          map("gD", vim.lsp.buf.declaration, "Goto Declaration")
-
-          -- Fuzzy find all the symbols in your current document.
-          --  Symbols are things like variables, functions, types, etc.
-          map("gs", builtin.lsp_document_symbols, "Goto Document symbols")
-
-          -- Fuzzy find all the symbols in your current workspace.
-          --  Similar to document symbols, except searches over your entire project.
-          map("gS", builtin.lsp_workspace_symbols, "Goto Workspace Symbols")
-
-          -- Jump to the type of the word under your cursor.
-          --  Useful when you're not sure what type a variable is and you want to see
-          --  the definition of its *type*, not where it was *defined*.
-          map("gt", vim.lsp.buf.type_definition, "Goto Type Definition")
 
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
@@ -100,16 +57,6 @@ return {
                 vim.api.nvim_clear_autocmds({ group = "kickstart-lsp-highlight", buffer = event2.buf })
               end,
             })
-          end
-
-          -- The following code creates a keymap to toggle inlay hints in your
-          -- code, if the language server you are using supports them
-          --
-          -- This may be unwanted, since they displace some of your code
-          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
-            map("<leader>th", function()
-              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
-            end, "[T]oggle Inlay [H]ints")
           end
         end,
       })
@@ -207,7 +154,7 @@ return {
           end
           return "make install_jsregexp"
         end)(),
-        dependencies = {},
+        dependencies = { "rafamadriz/friendly-snippets" },
         opts = {},
       },
       "folke/lazydev.nvim",
@@ -221,6 +168,15 @@ return {
       },
       completion = {
         documentation = { auto_show = false, auto_show_delay_ms = 500 },
+        menu = {
+          draw = {
+            columns = {
+              { "kind_icon" },
+              { "label", "label_description", gap = 1 },
+              { "source_name" },
+            },
+          },
+        },
       },
       sources = {
         default = { "lsp", "path", "snippets", "lazydev" },
@@ -241,6 +197,7 @@ return {
         -- See the configuration section for more details
         -- Load luvit types when the `vim.uv` word is found
         { path = "${3rd}/luv/library", words = { "vim%.uv" } },
+        "nvim-dap-ui",
       },
     },
   },
@@ -257,57 +214,10 @@ return {
     },
     config = function()
       require("flutter-tools").setup({})
-      local map = function(lhs, rhs, desc)
-        vim.keymap.set("n", lhs, rhs, { desc = desc })
+      -- TODO: use an autocommand to only do this when the buffer is flutter
+      for _, key in pairs(keymaps.flutter) do
+        keymaps.map(key)
       end
-      map("<leader>fr", "<cmd>FlutterRun<CR>", "Run the current project")
-      map("<leader>fd", "<cmd>FlutterDebug<CR>", " Force run current project in debug mode.")
-      map("<leader>fld", "<cmd>FlutterDevices<CR>", " Brings up a list of connected devices to select from.")
-      map(
-        "<leader>fle",
-        "<cmd>FlutterEmulators<CR>",
-        " Similar to devices but shows a list of emulators to choose from."
-      )
-      map("<leader>fpr", "<cmd>FlutterReload<CR>", " Reload the running project.")
-      map("<leader>fpR", "<cmd>FlutterRestart<CR>", " Restart the current project.")
-      map("<leader>fq", "<cmd>FlutterQuit<CR>", " Ends a running session.")
-      map("<leader>fa", "<cmd>FlutterAttach<CR>", " Attach to a running app.")
-      map(
-        "<leader>fD",
-        "<cmd>FlutterDetach<CR>",
-        " Ends a running session locally but keeps the process running on the device."
-      )
-      map(
-        "<leader>to",
-        "<cmd>FlutterOutlineToggle<CR>",
-        " Toggle the outline window showing the widget tree for the given file."
-      )
-      map(
-        "<leader>fo",
-        "<cmd>FlutterOutlineOpen<CR>",
-        " Opens an outline window showing the widget tree for the given file."
-      )
-      map("<leader>fts", "<cmd>FlutterDevTools<CR>", " Starts a Dart Dev Tools server.")
-      map("<leader>fta", "<cmd>FlutterDevToolsActivate<CR>", " Activates a Dart Dev Tools server.")
-      map(
-        "<leader>fu",
-        "<cmd>FlutterCopyProfilerUrl<CR>",
-        " Copies the profiler url to your system clipboard (+ register). Note that commands FlutterRun and FlutterDevTools must be executed first."
-      )
-      map(
-        "<leader>fL",
-        "<cmd>FlutterLspRestart<CR>",
-        " This command restarts the dart language server, and is intended for situations where it begins to work incorrectly."
-      )
-      map("grs", "<cmd>FlutterSuper<CR>", " Go to super class, method using custom LSP method dart/textDocument/super.")
-      map("gR", "<cmd>FlutterReanalyze<CR>", " Forces LSP server reanalyze using custom LSP method dart/reanalyze.")
-      map(
-        "grn",
-        "<cmd>FlutterRename<CR>",
-        " Renames and updates imports if lsp.settings.renameFilesWithClasses == always"
-      )
-      map("<leader>fc", "<cmd>FlutterLogClear<CR>", " Clears the log buffer.")
-      map("<leader>tfl", "<cmd>FlutterLogToggle<CR>", " Toggles the log buffer.")
     end,
   },
   {
@@ -337,6 +247,22 @@ return {
     dependencies = {
       "nvim-lua/plenary.nvim",
     },
-    opts = {},
+    opts = {
+      cmake_dap_configuration = { -- debug settings for cmake
+        name = "cpp",
+        type = "lldb",
+        -- command = "/Applications/Xcode.app/Contents/Developer/usr/bin/lldb-dap",
+        -- type = "codelldb",
+        request = "launch",
+        stopOnEntry = true,
+        runInTerminal = false,
+        program = function()
+          return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+        end,
+        cwd = "${workspaceFolder}",
+        args = {},
+        -- console = "integratedTerminal",
+      },
+    },
   },
 }

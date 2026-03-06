@@ -1,3 +1,6 @@
+local keymaps = require("config.keymaps")
+local troubleKeys = keymaps.lazyspec(keymaps.trouble)
+local todoCommentsKeys = keymaps.lazyspec(keymaps.todoComments)
 return {
   {
     "windwp/nvim-ts-autotag",
@@ -38,38 +41,7 @@ return {
     "folke/trouble.nvim",
     opts = {},
     cmd = "Trouble",
-    keys = {
-      {
-        "<leader>xx",
-        "<cmd>Trouble diagnostics toggle<cr>",
-        desc = "Diagnostics (Trouble)",
-      },
-      {
-        "<leader>xX",
-        "<cmd>Trouble diagnostics toggle filter.buf=0<cr>",
-        desc = "Buffer Diagnostics (Trouble)",
-      },
-      {
-        "<leader>cs",
-        "<cmd>Trouble symbols toggle focus=false<cr>",
-        desc = "Symbols (Trouble)",
-      },
-      {
-        "<leader>cl",
-        "<cmd>Trouble lsp toggle focus=false win.position=right<cr>",
-        desc = "LSP Definitions / references / ... (Trouble)",
-      },
-      {
-        "<leader>xL",
-        "<cmd>Trouble loclist toggle<cr>",
-        desc = "Location List (Trouble)",
-      },
-      {
-        "<leader>xQ",
-        "<cmd>Trouble qflist toggle<cr>",
-        desc = "Quickfix List (Trouble)",
-      },
-    },
+    keys = troubleKeys,
   },
   -- Finds and lists all of the TODO, HACK, BUG, etc comment
   -- in your project and loads them into a browsable list.
@@ -80,82 +52,19 @@ return {
     dependencies = { "nvim-lua/plenary.nvim" },
     opts = { signs = false },
     -- stylua: ignore
-    keys = {
-      { "]t", function() require("todo-comments").jump_next() end, desc = "Next Todo Comment" },
-      { "[t", function() require("todo-comments").jump_prev() end, desc = "Previous Todo Comment" },
-      { "<leader>xt", "<cmd>Trouble todo toggle<cr>", desc = "Todo (Trouble)" },
-      { "<leader>xT", "<cmd>Trouble todo toggle filter = {tag = {TODO,FIX,FIXME}}<cr>", desc = "Todo/Fix/Fixme (Trouble)" },
-      { "<leader>st", "<cmd>TodoTelescope<cr>", desc = "Todo" },
-      { "<leader>sT", "<cmd>TodoTelescope keywords=TODO,FIX,FIXME<cr>", desc = "Todo/Fix/Fixme" },
-    },
+    keys = todoCommentsKeys,
   },
   {
     "lewis6991/gitsigns.nvim",
     opts = {
       on_attach = function(bufnr)
-        local gitsigns = require("gitsigns")
-
-        local function map(mode, l, r, opts)
-          opts = opts or {}
-          opts.buffer = bufnr
-          vim.keymap.set(mode, l, r, opts)
+        local keys = require("config.keymaps").gitsigns()
+        -- print(vim.inspect(keys))
+        local map = require("config.keymaps").maplocal
+        ---@param key Key
+        for _, key in pairs(keys) do
+          map(key, bufnr)
         end
-
-        -- Navigation
-        map("n", "]h", function()
-          if vim.wo.diff then
-            vim.cmd.normal({ "]h", bang = true })
-          else
-            gitsigns.nav_hunk("next")
-          end
-        end, { desc = "Next [h]unk" })
-
-        map("n", "[h", function()
-          if vim.wo.diff then
-            vim.cmd.normal({ "[h", bang = true })
-          else
-            gitsigns.nav_hunk("prev")
-          end
-        end, { desc = "Previous [h]unk" })
-
-        -- Actions
-        map("n", "<leader>gs", gitsigns.stage_hunk, { desc = "[g]it [s]tage hunk" })
-        map("n", "<leader>gr", gitsigns.reset_hunk, { desc = "[g]it [r]eset hunk" })
-
-        map("v", "<leader>gs", function()
-          gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
-        end, { desc = "[g]it [s]tage hunk" })
-
-        map("v", "<leader>hr", function()
-          gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
-        end, { desc = "[g]it [r]eset hunk" })
-
-        map("n", "<leader>gS", gitsigns.stage_buffer, { desc = "[g]it [S]tage buffer" })
-        map("n", "<leader>gR", gitsigns.reset_buffer, { desc = "[g]it [R]eset buffer" })
-        map("n", "<leader>gp", gitsigns.preview_hunk, { desc = "[g]it [p]review hunk" })
-        map("n", "<leader>gi", gitsigns.preview_hunk_inline, { desc = "[g]it preview hunk [i]nline" })
-
-        map("n", "<leader>gb", function()
-          gitsigns.blame_line({ full = true })
-        end, { desc = "[g]it [b]lame line" })
-
-        map("n", "<leader>gd", gitsigns.diffthis, { desc = "[g]it [d]iff" })
-
-        map("n", "<leader>gD", function()
-          gitsigns.diffthis("~")
-        end, { desc = "[g]it [D]iff (previous commit)" })
-
-        map("n", "<leader>gQ", function()
-          gitsigns.setqflist("all")
-        end, { desc = "[g]it add all hunks to [Q]uickfix" })
-        map("n", "<leader>gq", gitsigns.setqflist, { desc = "[g]it add hunk to [q]uickfix" })
-
-        -- Toggles
-        map("n", "<leader>tb", gitsigns.toggle_current_line_blame, { desc = "[t]oggle [b]lame" })
-        map("n", "<leader>tw", gitsigns.toggle_word_diff, { desc = "[t]oggle [w]ord diff" })
-
-        -- Text object
-        map({ "o", "x" }, "ih", gitsigns.select_hunk, { desc = "inner hunk" })
       end,
     },
   },
@@ -226,42 +135,10 @@ return {
       pcall(require("telescope").load_extension, "fzf")
       pcall(require("telescope").load_extension, "ui-select")
 
-      -- See `:help telescope.builtin`
-      local builtin = require("telescope.builtin")
-      vim.keymap.set("n", "<leader>sh", builtin.help_tags, { desc = "[S]earch [H]elp" })
-      vim.keymap.set("n", "<leader>sk", builtin.keymaps, { desc = "[S]earch [K]eymaps" })
-      vim.keymap.set("n", "<leader>sf", builtin.find_files, { desc = "[S]earch [F]iles" })
-      vim.keymap.set("n", "<leader>ss", builtin.lsp_document_symbols, { desc = "[S]earch document [s]ymbols" })
-      vim.keymap.set("n", "<leader>sS", builtin.lsp_workspace_symbols, { desc = "[S]earch workspace [S]ymbols" })
-      vim.keymap.set("n", "<leader>sw", builtin.grep_string, { desc = "[S]earch current [W]ord" })
-      vim.keymap.set("n", "<leader>sg", builtin.live_grep, { desc = "[S]earch by [G]rep" })
-      vim.keymap.set("n", "<leader>sd", builtin.diagnostics, { desc = "[S]earch [D]iagnostics" })
-      vim.keymap.set("n", "<leader>sr", builtin.resume, { desc = "[S]earch [R]esume" })
-      vim.keymap.set("n", "<leader>s.", builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set("n", "<leader><leader>", builtin.buffers, { desc = "[ ] Find existing buffers" })
-
-      -- Slightly advanced example of overriding default behavior and theme
-      vim.keymap.set("n", "<leader>/", function()
-        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-        builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-          winblend = 10,
-          previewer = false,
-        }))
-      end, { desc = "[/] Fuzzily search in current buffer" })
-
-      -- It's also possible to pass additional configuration options.
-      --  See `:help telescope.builtin.live_grep()` for information about particular keys
-      vim.keymap.set("n", "<leader>s/", function()
-        builtin.live_grep({
-          grep_open_files = true,
-          prompt_title = "Live Grep in Open Files",
-        })
-      end, { desc = "[S]earch [/] in Open Files" })
-
-      -- Shortcut for searching your Neovim configuration files
-      vim.keymap.set("n", "<leader>sn", function()
-        builtin.find_files({ cwd = vim.fn.stdpath("config") })
-      end, { desc = "[S]earch [N]eovim files" })
+      local keys = keymaps.telescope
+      for _, key in pairs(keys) do
+        keymaps.map(key)
+      end
     end,
   },
   {
@@ -299,7 +176,11 @@ return {
   },
   {
     "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
+    cmd = {
+      "MarkdownPreviewToggle",
+      "MarkdownPreview",
+      "MarkdownPreviewStop",
+    },
     build = "cd app && yarn install",
     init = function()
       vim.g.mkdp_filetypes = { "markdown" }
@@ -311,6 +192,18 @@ return {
       vim.g.mkdp_browserfunc = "OpenMarkdownPreview"
     end,
     ft = { "markdown" },
+    config = function()
+      -- Whenever we enter a markdown buffer add the markdown preview binding, otherwise do not
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+        callback = function(ev)
+          if vim.bo.filetype == "markdown" then
+            for _, key in pairs(keymaps.markdownPreview) do
+              keymaps.maplocal(key, ev.buf)
+            end
+          end
+        end,
+      })
+    end,
   },
   {
     "kylechui/nvim-surround",

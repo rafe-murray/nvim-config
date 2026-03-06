@@ -1,5 +1,6 @@
 -- Load the colorscheme
 require("tokyonight").load()
+-- vim.cmd("colorscheme onedark")
 
 -- Language servers
 vim.lsp.enable("clangd")
@@ -76,8 +77,14 @@ vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.o.scrolloff = 10
 -- Load all other config files
-require("config/keymaps")
-require("config/fold")
+require("config.keymaps")
+require("config.fold")
+require("config.debug")
+
+local keymaps = require("config.keymaps")
+for _, key in pairs(keymaps.keys) do
+  keymaps.map(key)
+end
 
 local default_on_attach = vim.lsp.config["clangd"].on_attach or {}
 vim.lsp.config("clangd", {
@@ -128,6 +135,12 @@ vim.lsp.config("yamlls", {
     },
   },
 })
+vim.lsp.enable("slang_server", true)
+
+local capabilities = require("blink.cmp").get_lsp_capabilities(nil, true)
+vim.lsp.config("svlangserver", {
+  capabilities = capabilities,
+})
 
 -- Add autocmd to remove everything that takes up the left margin on man pages
 vim.api.nvim_create_autocmd("FileType", {
@@ -139,5 +152,6 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.o.foldcolumn = "0"
   end,
 })
-
+require("luasnip.loaders.from_vscode").lazy_load()
 vim.o.termguicolors = true
+require("nvim-autopairs").get_rules("`")[1].not_filetypes = { "systemverilog" }

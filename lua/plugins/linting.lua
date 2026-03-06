@@ -145,7 +145,9 @@ return {
         ["*"] = { "injected" },
       },
       format_on_save = {
-        lsp_format = "fallback",
+        -- Run the LSP formatter first and then run other formatters
+        -- This lets us use LSP formatting alongside the injected ones
+        lsp_format = "first",
         timeout_ms = 500,
       },
     },
