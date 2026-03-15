@@ -88,6 +88,7 @@ end
 
 local default_on_attach = vim.lsp.config["clangd"].on_attach or {}
 vim.lsp.config("clangd", {
+  cmd = { "/opt/homebrew/opt/llvm/bin/clangd" },
   on_attach = function(client, bufnr)
     default_on_attach(client, bufnr)
     vim.keymap.set("n", "<leader>h", function()
@@ -155,3 +156,28 @@ vim.api.nvim_create_autocmd("FileType", {
 require("luasnip.loaders.from_vscode").lazy_load()
 vim.o.termguicolors = true
 require("nvim-autopairs").get_rules("`")[1].not_filetypes = { "systemverilog" }
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = require("config.treesitter").parsers,
+  callback = function()
+    local installed_parsers = require("nvim-treesitter").get_installed("parsers")
+    -- TODO: if performance is bad maybe cache/hash installed parsers
+    local parser = vim.bo.ft
+    if not vim.list_contains(installed_parsers, parser) then
+      local async = require("nvim-treesitter.async")
+      async.arun(function()
+        async.await(require("nvim-treesitter").install(parser))
+        vim.treesitter.start()
+        -- require("nvim-treesitter.install").install(parser)
+      end)
+      -- require("nvim-treesitter").install(parser)
+    else
+      vim.treesitter.start()
+    end
+  end,
+})
+vim.api.nvim_create_autocmd("BufWritePost", {
+  pattern = { "tex" },
+  callback = function()
+    vim.cmd("VimtexCompile")
+  end,
+})

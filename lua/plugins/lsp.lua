@@ -265,4 +265,7 @@ return {
       },
     },
   },
+  {
+    "rhysd/vim-llvm",
+  },
 }

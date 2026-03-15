@@ -1,0 +1,36 @@
+---@class TreesitterConfig
+local M = {
+  parsers = {
+    "bash",
+    "c",
+    "cpp",
+    "cmake",
+    "diff",
+    "go",
+    "html",
+    "javascript",
+    "jsdoc",
+    "json",
+    "lua",
+    "luadoc",
+    "luap",
+    "markdown",
+    "markdown_inline",
+    "printf",
+    "proto",
+    "python",
+    "query",
+    "regex",
+    "toml",
+    "tsx",
+    "typescript",
+    "tex",
+    "vim",
+    "vimdoc",
+    "xml",
+    "yaml",
+    "zsh",
+  },
+}
+
+return M

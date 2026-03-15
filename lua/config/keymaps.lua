@@ -1,3 +1,4 @@
+-- vim:foldmethod=expr
 -- local gitsigns = require("gitsigns")
 local builtin = require("telescope.builtin")
 
@@ -18,6 +19,7 @@ local builtin = require("telescope.builtin")
 ---@field todoCommends Key[]
 ---@field lsp Key[]
 ---@field flutter Key[]
+---@field treesitter Key[]
 local M = {
   keys = {
     -- Window mappings
@@ -138,7 +140,7 @@ local M = {
             gitsigns.nav_hunk("next")
           end
         end,
-        { desc = "Next [h]unk" },
+        desc = "Next [h]unk",
       },
       {
         mode = "n",
@@ -150,7 +152,7 @@ local M = {
             gitsigns.nav_hunk("prev")
           end
         end,
-        { desc = "Previous [h]unk" },
+        desc = "Previous [h]unk",
       },
 
       -- Actions
@@ -158,13 +160,13 @@ local M = {
         mode = "n",
         lhs = "<leader>gs",
         rhs = gitsigns.stage_hunk,
-        { desc = "[g]it [s]tage hunk" },
+        desc = "[g]it [s]tage hunk",
       },
       {
         mode = "n",
         lhs = "<leader>gr",
         rhs = gitsigns.reset_hunk,
-        { desc = "[g]it [r]eset hunk" },
+        desc = "[g]it [r]eset hunk",
       },
       {
         mode = "v",
@@ -172,7 +174,7 @@ local M = {
         rhs = function()
           gitsigns.stage_hunk({ vim.fn.line("."), vim.fn.line("v") })
         end,
-        { desc = "[g]it [s]tage hunk" },
+        desc = "[g]it [s]tage hunk",
       },
       {
         mode = "v",
@@ -180,31 +182,31 @@ local M = {
         rhs = function()
           gitsigns.reset_hunk({ vim.fn.line("."), vim.fn.line("v") })
         end,
-        { desc = "[g]it [r]eset hunk" },
+        desc = "[g]it [r]eset hunk",
       },
       {
         mode = "n",
         lhs = "<leader>gS",
         rhs = gitsigns.stage_buffer,
-        { desc = "[g]it [S]tage buffer" },
+        desc = "[g]it [S]tage buffer",
       },
       {
         mode = "n",
         lhs = "<leader>gR",
         rhs = gitsigns.reset_buffer,
-        { desc = "[g]it [R]eset buffer" },
+        desc = "[g]it [R]eset buffer",
       },
       {
         mode = "n",
         lhs = "<leader>gp",
         rhs = gitsigns.preview_hunk,
-        { desc = "[g]it [p]review hunk" },
+        desc = "[g]it [p]review hunk",
       },
       {
         mode = "n",
         lhs = "<leader>gi",
         rhs = gitsigns.preview_hunk_inline,
-        { desc = "[g]it preview hunk [i]nline" },
+        desc = "[g]it preview hunk [i]nline",
       },
       {
         mode = "n",
@@ -212,13 +214,13 @@ local M = {
         rhs = function()
           gitsigns.blame_line({ full = true })
         end,
-        { desc = "[g]it [b]lame line" },
+        desc = "[g]it [b]lame line",
       },
       {
         mode = "n",
         lhs = "<leader>gd",
         rhs = gitsigns.diffthis,
-        { desc = "[g]it [d]iff" },
+        desc = "[g]it [d]iff",
       },
       {
         mode = "n",
@@ -226,7 +228,7 @@ local M = {
         rhs = function()
           gitsigns.diffthis("~")
         end,
-        { desc = "[g]it [D]iff (previous commit)" },
+        desc = "[g]it [D]iff (previous commit)",
       },
       {
         mode = "n",
@@ -234,13 +236,13 @@ local M = {
         rhs = function()
           gitsigns.setqflist("all")
         end,
-        { desc = "[g]it add all hunks to [Q]uickfix" },
+        desc = "[g]it add all hunks to [Q]uickfix",
       },
       {
         mode = "n",
         lhs = "<leader>gq",
         rhs = gitsigns.setqflist,
-        { desc = "[g]it add hunk to [q]uickfix" },
+        desc = "[g]it add hunk to [q]uickfix",
       },
 
       -- Toggles
@@ -248,13 +250,13 @@ local M = {
         mode = "n",
         lhs = "<leader>tb",
         rhs = gitsigns.toggle_current_line_blame,
-        { desc = "[t]oggle [b]lame" },
+        desc = "[t]oggle [b]lame",
       },
       {
         mode = "n",
         lhs = "<leader>tw",
         rhs = gitsigns.toggle_word_diff,
-        { desc = "[t]oggle [w]ord diff" },
+        desc = "[t]oggle [w]ord diff",
       },
 
       -- Text object
@@ -262,7 +264,7 @@ local M = {
         mode = { "o", "x" },
         lhs = "ih",
         rhs = gitsigns.select_hunk,
-        { desc = "inner hunk" },
+        desc = "inner hunk",
       },
     }
   end,
@@ -591,6 +593,144 @@ local M = {
         require("dap").toggle_breakpoint()
       end,
       desc = "Toggle breakpoint",
+    },
+  },
+  treesitter = {
+    {
+      mode = { "n", "x", "o" },
+      lhs = "]m",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_next_start("@function.outer", "textobjects")
+      end,
+      desc = "Next method start",
+    },
+    {
+      mode = { "n", "x", "o" },
+      lhs = "]l",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_next_start("@class.outer", "textobjects")
+      end,
+      desc = "Next class start",
+    },
+    -- You can also pass a list to group multiple queries.
+    {
+      mode = { "n", "x", "o" },
+      lhs = "]o",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_next_start({ "@loop.inner", "@loop.outer" }, "textobjects")
+      end,
+      desc = "Next loop start",
+    },
+    -- You can also use captures from other query groups like `locals.scm` or `folds.scm`
+    {
+      mode = { "n", "x", "o" },
+      lhs = "]s",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_next_start("@local.scope", "locals")
+      end,
+      desc = "Next scope",
+    },
+    {
+      mode = { "n", "x", "o" },
+      lhs = "]z",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_next_start("@fold", "folds")
+      end,
+      desc = "Next fold",
+    },
+
+    {
+      mode = { "n", "x", "o" },
+      lhs = "]M",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_next_end("@function.outer", "textobjects")
+      end,
+      desc = "Next method end",
+    },
+    {
+      mode = { "n", "x", "o" },
+      lhs = "]L",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_next_end("@class.outer", "textobjects")
+      end,
+      desc = "Next class end",
+    },
+
+    {
+      mode = { "n", "x", "o" },
+      lhs = "[m",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_previous_start("@function.outer", "textobjects")
+      end,
+      desc = "Previous method start",
+    },
+    {
+      mode = { "n", "x", "o" },
+      lhs = "[l",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_previous_start("@class.outer", "textobjects")
+      end,
+      desc = "Previous class start",
+    },
+
+    {
+      mode = { "n", "x", "o" },
+      lhs = "[M",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_previous_end("@function.outer", "textobjects")
+      end,
+      desc = "Previous method end",
+    },
+    {
+      mode = { "n", "x", "o" },
+      lhs = "[L",
+      rhs = function()
+        require("nvim-treesitter-textobjects.move").goto_previous_end("@class.outer", "textobjects")
+      end,
+      desc = "Previous class end",
+    },
+
+    -- keymaps
+    {
+      mode = { "x", "o" },
+      lhs = "am",
+      rhs = function()
+        require("nvim-treesitter-textobjects.select").select_textobject("@function.outer", "textobjects")
+      end,
+      desc = "method",
+    },
+    {
+      mode = { "x", "o" },
+      lhs = "im",
+      rhs = function()
+        require("nvim-treesitter-textobjects.select").select_textobject("@function.inner", "textobjects")
+      end,
+      desc = "method",
+    },
+    {
+      mode = { "x", "o" },
+      lhs = "al",
+      rhs = function()
+        require("nvim-treesitter-textobjects.select").select_textobject("@class.outer", "textobjects")
+      end,
+      desc = "class",
+    },
+    {
+      mode = { "x", "o" },
+      lhs = "il",
+      rhs = function()
+        require("nvim-treesitter-textobjects.select").select_textobject("@class.inner", "textobjects")
+      end,
+      desc = "class",
+    },
+    -- You can also use captures from other query groups like `locals.scm`
+    {
+      mode = { "x", "o" },
+      lhs = "as",
+      rhs = function()
+        require("nvim-treesitter-textobjects.select").select_textobject("@local.scope", "locals")
+      end,
+      desc = "scope",
     },
   },
 }

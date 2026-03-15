@@ -22,12 +22,17 @@ require("lazy").setup({
   rocks = {
     hererocks = true, -- recommended if you do not have global installation of Lua 5.1.
   },
+  ---@type LazySpec
   spec = {
     { import = "plugins" },
   },
   defaults = {
     lazy = false,
     version = false, -- always use the latest git commit
+  },
+  change_detection = {
+    enabled = false,
+    notify = false,
   },
   -- automatically check for plugin updates
   checker = {

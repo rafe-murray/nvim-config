@@ -143,6 +143,8 @@ return {
         tex = { "tex-fmt" },
         toml = { "taplo" },
         ["*"] = { "injected" },
+        bash = { "shfmt" },
+        zsh = { "beautysh" },
       },
       format_on_save = {
         -- Run the LSP formatter first and then run other formatters
