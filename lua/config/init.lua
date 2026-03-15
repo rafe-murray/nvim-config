@@ -181,3 +181,9 @@ vim.api.nvim_create_autocmd("BufWritePost", {
     vim.cmd("VimtexCompile")
   end,
 })
+
+vim.filetype.add({
+  pattern = {
+    [".*/waybar/config"] = "json"
+  }
+})
