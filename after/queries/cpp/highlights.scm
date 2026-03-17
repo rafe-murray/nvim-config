@@ -1,5 +1,8 @@
 ; extends
 
-"module" @keyword.type
+[
+  "import"
+  "export"
+] @keyword.import
 
-(auto) @keyword
+"module" @keyword.type
