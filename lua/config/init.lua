@@ -136,11 +136,25 @@ vim.lsp.config("yamlls", {
     },
   },
 })
-vim.lsp.enable("slang_server", true)
 
-local capabilities = require("blink.cmp").get_lsp_capabilities(nil, true)
+vim.lsp.enable("verible", false)
+vim.lsp.enable("slang_server", true)
+-- Disable certain features of svlangserver since slang_server does them better
+-- Unfortunately, slang_server does not provide good completions so svlangserver is still needed for a modern editor experience
 vim.lsp.config("svlangserver", {
-  capabilities = capabilities,
+  ---@param client vim.lsp.Client
+  on_attach = function(client, _)
+    ---@type lsp.ServerCapabilities
+    local capabilities = {
+      hoverProvider = false,
+      definitionProvider = false,
+      workspaceSymbolProvider = false,
+      documentSymbolProvider = false,
+      renameProvider = false,
+      referencesProvider = false,
+    }
+    client.server_capabilities = vim.tbl_deep_extend("force", client.server_capabilities, capabilities)
+  end,
 })
 
 -- Add autocmd to remove everything that takes up the left margin on man pages

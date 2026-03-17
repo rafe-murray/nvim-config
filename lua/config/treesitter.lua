@@ -21,6 +21,7 @@ local M = {
     "python",
     "query",
     "regex",
+    "systemverilog",
     "toml",
     "tsx",
     "typescript",
