@@ -1,6 +1,4 @@
 -- vim:foldmethod=expr
--- local gitsigns = require("gitsigns")
-local builtin = require("telescope.builtin")
 
 ---@alias Mode "n"|"i"|"x"|"v"|"s"|"o"|"l"|"c"|"t"
 
@@ -13,11 +11,11 @@ local builtin = require("telescope.builtin")
 ---@class Keymaps
 ---@field keys Key[]
 ---@field gitsigns fun(): Key[]
----@field telescope Key[]
+---@field telescope fun(): Key[]
 ---@field markdownPreview Key[]
 ---@field trouble Key[]
 ---@field todoCommends Key[]
----@field lsp Key[]
+---@field lsp fun(): Key[]
 ---@field flutter Key[]
 ---@field treesitter Key[]
 ---@field typstPreview Key[]
@@ -269,62 +267,65 @@ local M = {
       },
     }
   end,
-  telescope = {
-    { mode = "n", lhs = "<leader>sh", rhs = builtin.help_tags, desc = "[S]earch [H]elp" },
-    { mode = "n", lhs = "<leader>sk", rhs = builtin.keymaps, desc = "[S]earch [K]eymaps" },
-    { mode = "n", lhs = "<leader>sf", rhs = builtin.find_files, desc = "[S]earch [F]iles" },
-    { mode = "n", lhs = "<leader>ss", rhs = builtin.lsp_document_symbols, desc = "[S]earch document [s]ymbols" },
-    { mode = "n", lhs = "<leader>sS", rhs = builtin.lsp_workspace_symbols, desc = "[S]earch workspace [S]ymbols" },
-    { mode = "n", lhs = "<leader>sw", rhs = builtin.grep_string, desc = "[S]earch current [W]ord" },
-    { mode = "n", lhs = "<leader>sg", rhs = builtin.live_grep, desc = "[S]earch by [G]rep" },
-    { mode = "n", lhs = "<leader>sd", rhs = builtin.diagnostics, desc = "[S]earch [D]iagnostics" },
-    { mode = "n", lhs = "<leader>sr", rhs = builtin.resume, desc = "[S]earch [R]esume" },
-    {
-      mode = "n",
-      lhs = "<leader>s.",
-      rhs = builtin.oldfiles,
-      desc = '[S]earch Recent Files ("." for repeat)',
-    },
-    { mode = "n", lhs = "<leader><leader>", rhs = builtin.buffers, desc = "[ ] Find existing buffers" },
+  telescope = function()
+    local builtin = require("telescope.builtin")
+    return {
+      { mode = "n", lhs = "<leader>sh", rhs = builtin.help_tags, desc = "[S]earch [H]elp" },
+      { mode = "n", lhs = "<leader>sk", rhs = builtin.keymaps, desc = "[S]earch [K]eymaps" },
+      { mode = "n", lhs = "<leader>sf", rhs = builtin.find_files, desc = "[S]earch [F]iles" },
+      { mode = "n", lhs = "<leader>ss", rhs = builtin.lsp_document_symbols, desc = "[S]earch document [s]ymbols" },
+      { mode = "n", lhs = "<leader>sS", rhs = builtin.lsp_workspace_symbols, desc = "[S]earch workspace [S]ymbols" },
+      { mode = "n", lhs = "<leader>sw", rhs = builtin.grep_string, desc = "[S]earch current [W]ord" },
+      { mode = "n", lhs = "<leader>sg", rhs = builtin.live_grep, desc = "[S]earch by [G]rep" },
+      { mode = "n", lhs = "<leader>sd", rhs = builtin.diagnostics, desc = "[S]earch [D]iagnostics" },
+      { mode = "n", lhs = "<leader>sr", rhs = builtin.resume, desc = "[S]earch [R]esume" },
+      {
+        mode = "n",
+        lhs = "<leader>s.",
+        rhs = builtin.oldfiles,
+        desc = '[S]earch Recent Files ("." for repeat)',
+      },
+      { mode = "n", lhs = "<leader><leader>", rhs = builtin.buffers, desc = "[ ] Find existing buffers" },
 
-    -- Slightly advanced example of overriding default behavior and theme
-    {
-      mode = "n",
-      lhs = "<leader>/",
-      rhs = function()
-        -- You can pass additional configuration to Telescope to change the theme, layout, etc.
-        builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
-          winblend = 10,
-          previewer = false,
-        }))
-      end,
-      desc = "[/] Fuzzily search in current buffer",
-    },
+      -- Slightly advanced example of overriding default behavior and theme
+      {
+        mode = "n",
+        lhs = "<leader>/",
+        rhs = function()
+          -- You can pass additional configuration to Telescope to change the theme, layout, etc.
+          builtin.current_buffer_fuzzy_find(require("telescope.themes").get_dropdown({
+            winblend = 10,
+            previewer = false,
+          }))
+        end,
+        desc = "[/] Fuzzily search in current buffer",
+      },
 
-    -- It's also possible to pass additional configuration options.
-    --  See `:help telescope.builtin.live_grep()` for information about particular keys
-    {
-      mode = "n",
-      lhs = "<leader>s/",
-      rhs = function()
-        builtin.live_grep({
-          grep_open_files = true,
-          prompt_title = "Live Grep in Open Files",
-        })
-      end,
-      desc = "[S]earch [/] in Open Files",
-    },
+      -- It's also possible to pass additional configuration options.
+      --  See `:help telescope.builtin.live_grep()` for information about particular keys
+      {
+        mode = "n",
+        lhs = "<leader>s/",
+        rhs = function()
+          builtin.live_grep({
+            grep_open_files = true,
+            prompt_title = "Live Grep in Open Files",
+          })
+        end,
+        desc = "[S]earch [/] in Open Files",
+      },
 
-    -- Shortcut for searching your Neovim configuration files
-    {
-      mode = "n",
-      lhs = "<leader>sn",
-      rhs = function()
-        builtin.find_files({ cwd = vim.fn.stdpath("config") })
-      end,
-      desc = "[S]earch [N]eovim files",
-    },
-  },
+      -- Shortcut for searching your Neovim configuration files
+      {
+        mode = "n",
+        lhs = "<leader>sn",
+        rhs = function()
+          builtin.find_files({ cwd = vim.fn.stdpath("config") })
+        end,
+        desc = "[S]earch [N]eovim files",
+      },
+    }
+  end,
   markdownPreview = {
     {
       mode = "n",
@@ -413,62 +414,65 @@ local M = {
       desc = "Todo/Fix/Fixme",
     },
   },
-  lsp = {
-    {
-      mode = "n",
-      lhs = "grn",
-      rhs = vim.lsp.buf.rename,
-      desc = "Rename",
-    },
-    {
-      mode = { "n", "x" },
-      lhs = "gra",
-      rhs = vim.lsp.buf.code_action,
-      desc = "Code Action",
-    },
-    {
-      mode = "n",
-      lhs = "grr",
-      rhs = builtin.lsp_references,
-      desc = "Goto References",
-    },
-    {
-      mode = "n",
-      lhs = "gri",
-      rhs = builtin.lsp_implementations,
-      desc = "Goto Implementation",
-    },
-    {
-      mode = "n",
-      lhs = "gd",
-      rhs = builtin.lsp_definitions,
-      desc = "Goto Definition",
-    },
-    {
-      mode = "n",
-      lhs = "gD",
-      rhs = vim.lsp.buf.declaration,
-      desc = "Goto Declaration",
-    },
-    {
-      mode = "n",
-      lhs = "gs",
-      rhs = builtin.lsp_document_symbols,
-      desc = "Goto Document symbols",
-    },
-    {
-      mode = "n",
-      lhs = "gS",
-      rhs = builtin.lsp_workspace_symbols,
-      desc = "Goto Workspace Symbols",
-    },
-    {
-      mode = "n",
-      lhs = "gt",
-      rhs = vim.lsp.buf.type_definition,
-      desc = "Goto Type Definition",
-    },
-  },
+  lsp = function()
+    local builtin = require("telescope.builtin")
+    return {
+      {
+        mode = "n",
+        lhs = "grn",
+        rhs = vim.lsp.buf.rename,
+        desc = "Rename",
+      },
+      {
+        mode = { "n", "x" },
+        lhs = "gra",
+        rhs = vim.lsp.buf.code_action,
+        desc = "Code Action",
+      },
+      {
+        mode = "n",
+        lhs = "grr",
+        rhs = builtin.lsp_references,
+        desc = "Goto References",
+      },
+      {
+        mode = "n",
+        lhs = "gri",
+        rhs = builtin.lsp_implementations,
+        desc = "Goto Implementation",
+      },
+      {
+        mode = "n",
+        lhs = "gd",
+        rhs = builtin.lsp_definitions,
+        desc = "Goto Definition",
+      },
+      {
+        mode = "n",
+        lhs = "gD",
+        rhs = vim.lsp.buf.declaration,
+        desc = "Goto Declaration",
+      },
+      {
+        mode = "n",
+        lhs = "gs",
+        rhs = builtin.lsp_document_symbols,
+        desc = "Goto Document symbols",
+      },
+      {
+        mode = "n",
+        lhs = "gS",
+        rhs = builtin.lsp_workspace_symbols,
+        desc = "Goto Workspace Symbols",
+      },
+      {
+        mode = "n",
+        lhs = "gt",
+        rhs = vim.lsp.buf.type_definition,
+        desc = "Goto Type Definition",
+      },
+    }
+  end,
   flutter = {
     { mode = "n", lhs = "<leader>fr", rhs = "<cmd>FlutterRun<CR>", desc = "Run the current project" },
     {

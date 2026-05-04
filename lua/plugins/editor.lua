@@ -135,7 +135,7 @@ return {
       pcall(require("telescope").load_extension, "fzf")
       pcall(require("telescope").load_extension, "ui-select")
 
-      local keys = keymaps.telescope
+      local keys = keymaps.telescope()
       for _, key in pairs(keys) do
         keymaps.map(key)
       end
