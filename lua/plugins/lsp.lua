@@ -178,6 +178,14 @@ return {
           },
         },
       },
+      cmdline = {
+        keymap = {
+          preset = "cmdline",
+          -- Use enter for completion as well to be more consistent
+          ["<CR>"] = { "select_and_accept", "fallback" },
+        },
+        -- completion = { menu = { auto_show = false } },
+      },
       sources = {
         default = { "lsp", "path", "snippets", "lazydev" },
         providers = {
@@ -267,5 +275,12 @@ return {
   },
   {
     "rhysd/vim-llvm",
+  },
+  {
+    "hudson-trading/slang-server.nvim",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    },
+    opts = {},
   },
 }

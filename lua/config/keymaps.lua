@@ -20,6 +20,7 @@ local builtin = require("telescope.builtin")
 ---@field lsp Key[]
 ---@field flutter Key[]
 ---@field treesitter Key[]
+---@field typstPreview Key[]
 local M = {
   keys = {
     -- Window mappings
@@ -732,6 +733,9 @@ local M = {
       end,
       desc = "scope",
     },
+  },
+  typstPreview = {
+    { mode = "n", lhs = "<leader>p", rhs = ":TypstPreviewToggle<CR>", desc = "Toggle Typst preview" },
   },
 }
 

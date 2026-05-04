@@ -20,8 +20,9 @@ vim.o.splitright = true
 vim.o.grepformat = "%f:%l:%c:%m"
 vim.o.grepprg = "rg --vimgrep -uu"
 -- Uncomment for wrapped text
--- vim.g.breakindent = true
--- vim.g.wrap = true
+vim.o.breakindent = true
+vim.o.wrap = true
+vim.o.linebreak = true
 
 -- Tabs
 vim.o.shiftwidth = 2
@@ -113,10 +114,24 @@ vim.lsp.config("pyright", {
   },
 })
 
+---@module "schemastore"
+---@return SchemaEntry[]
+local getSchemas = function()
+  local schemaDir = vim.fn.stdpath("config") .. "/schemas/"
+  return {
+    {
+      name = "slang config",
+      description = "Configuration file for slang-server",
+      fileMatch = { ".slang/server.json", ".slang/local/server.json" },
+      url = vim.fn.stdpath("config") .. "/schemas/slang_config.schema.json",
+    },
+  }
+end
+
 vim.lsp.config("jsonls", {
   settings = {
     json = {
-      schemas = require("schemastore").json.schemas(),
+      schemas = require("schemastore").json.schemas({ extra = getSchemas() }),
       validate = { enable = true },
     },
   },
@@ -136,6 +151,15 @@ vim.lsp.config("yamlls", {
     },
   },
 })
+vim.lsp.config("sonarlint-language-server", {
+  settings = {
+    sonarlint = {
+      pathToCompileCommands = "./compile_commands.json",
+      disableTelemetry = false,
+    },
+  },
+})
+vim.lsp.enable("sonarlint-language-server")
 
 vim.lsp.enable("verible", false)
 vim.lsp.enable("slang_server", true)
@@ -155,6 +179,7 @@ vim.lsp.config("svlangserver", {
     }
     client.server_capabilities = vim.tbl_deep_extend("force", client.server_capabilities, capabilities)
   end,
+  root_markers = { "*.sv" }, -- Treat every source directory as top-level
 })
 
 -- Add autocmd to remove everything that takes up the left margin on man pages
@@ -171,22 +196,27 @@ require("luasnip.loaders.from_vscode").lazy_load()
 vim.o.termguicolors = true
 require("nvim-autopairs").get_rules("`")[1].not_filetypes = { "systemverilog" }
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = require("config.treesitter").parsers,
+  -- pattern = require("config.treesitter").parsers,
   callback = function()
-    local installed_parsers = require("nvim-treesitter").get_installed("parsers")
-    -- TODO: if performance is bad maybe cache/hash installed parsers
-    local parser = vim.bo.ft
-    if not vim.list_contains(installed_parsers, parser) then
-      local async = require("nvim-treesitter.async")
-      async.arun(function()
-        async.await(require("nvim-treesitter").install(parser))
-        vim.treesitter.start()
-        -- require("nvim-treesitter.install").install(parser)
-      end)
-      -- require("nvim-treesitter").install(parser)
-    else
+    local parser = vim.treesitter.get_parser(nil, nil, { error = false })
+    if parser then
       vim.treesitter.start()
     end
+
+    -- local installed_parsers = require("nvim-treesitter").get_installed("parsers")
+    -- -- TODO: if performance is bad maybe cache/hash installed parsers
+    -- local parser = vim.bo.ft
+    -- if not vim.list_contains(installed_parsers, parser) then
+    --   local async = require("nvim-treesitter.async")
+    --   async.arun(function()
+    --     async.await(require("nvim-treesitter").install(parser))
+    --     vim.treesitter.start()
+    --     -- require("nvim-treesitter.install").install(parser)
+    --   end)
+    --   -- require("nvim-treesitter").install(parser)
+    -- else
+    --   vim.treesitter.start()
+    -- end
   end,
 })
 vim.api.nvim_create_autocmd("BufWritePost", {
@@ -198,6 +228,7 @@ vim.api.nvim_create_autocmd("BufWritePost", {
 
 vim.filetype.add({
   pattern = {
-    [".*/waybar/config"] = "json"
-  }
+    [".*/waybar/config"] = "json",
+    [".*.f"] = "txt",
+  },
 })

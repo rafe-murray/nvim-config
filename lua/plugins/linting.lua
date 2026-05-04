@@ -108,6 +108,8 @@ return {
       require("lint").linters_by_ft = {
         docker = { "hadolint" },
         typescript = { "eslint_d" },
+        c = { "cppcheck" },
+        cpp = { "cppcheck" },
       }
       local M = {}
       function M.lint()

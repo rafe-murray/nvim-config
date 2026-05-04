@@ -206,6 +206,25 @@ return {
     end,
   },
   {
+    "chomosuke/typst-preview.nvim",
+    ft = { "typst" },
+    version = "1.*",
+    opts = {}, -- lazy.nvim will implicitly calls `setup {}`
+    config = function(opts)
+      require("typst-preview").setup(opts)
+      -- We might need to call setup() here
+      vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+        callback = function(ev)
+          if vim.bo.filetype == "typst" then
+            for _, key in pairs(keymaps.typstPreview) do
+              keymaps.maplocal(key, ev.buf)
+            end
+          end
+        end,
+      })
+    end,
+  },
+  {
     "kylechui/nvim-surround",
     version = "^3.0.0", -- Use for stability; omit to use `main` branch for the latest features
     event = "VeryLazy",
