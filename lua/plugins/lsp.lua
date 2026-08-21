@@ -232,12 +232,12 @@ return {
     "esmuellert/nvim-eslint",
     opts = {},
   },
-  {
-    "nvim-neorg/neorg",
-    lazy = false, -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
-    version = "*", -- Pin Neorg to the latest stable release
-    config = true,
-  },
+  -- {
+  --   "nvim-neorg/neorg",
+  --   lazy = false, -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
+  --   version = "*", -- Pin Neorg to the latest stable release
+  --   config = true,
+  -- },
   {
     "b0o/schemastore.nvim",
   },
@@ -282,5 +282,15 @@ return {
       "MunifTanjim/nui.nvim",
     },
     opts = {},
+  },
+  {
+    "cwrau/yaml-schema-detect.nvim",
+    ---@module "yaml-schema-detect"
+    ---@type YamlSchemaDetectOptions
+    opts = {}, -- use default options
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    ft = { "yaml", "helm", "yaml.helm-values" },
   },
 }

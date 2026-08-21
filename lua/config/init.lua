@@ -81,6 +81,7 @@ vim.o.scrolloff = 10
 require("config.keymaps")
 require("config.fold")
 require("config.debug")
+require("config.filetype")
 
 local keymaps = require("config.keymaps")
 for _, key in pairs(keymaps.keys) do
@@ -148,6 +149,10 @@ vim.lsp.config("yamlls", {
         url = "",
       },
       schemas = require("schemastore").yaml.schemas(),
+      -- Add GitLab CI yaml extension
+      customTags = {
+        "!reference sequence",
+      },
     },
   },
 })
@@ -180,6 +185,12 @@ vim.lsp.config("svlangserver", {
     client.server_capabilities = vim.tbl_deep_extend("force", client.server_capabilities, capabilities)
   end,
   root_markers = { "*.sv" }, -- Treat every source directory as top-level
+})
+
+vim.lsp.config("intelephense", {
+  root_markers = {
+    ".vscode",
+  },
 })
 
 -- Add autocmd to remove everything that takes up the left margin on man pages

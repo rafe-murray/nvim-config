@@ -110,6 +110,7 @@ return {
         typescript = { "eslint_d" },
         c = { "cppcheck" },
         cpp = { "cppcheck" },
+        php = { "phpcs" },
       }
       local M = {}
       function M.lint()
@@ -139,9 +140,13 @@ return {
         ["*"] = { "injected" },
         bash = { "shfmt" },
         cmake = { "cmake_format" },
+        dockerfile = { "hadolint" },
+        html = { "prettier" },
         javascript = { "prettier" },
         lua = { "stylua" },
         markdown = { "prettier" },
+        php = { "phpcbf", lsp_format = "never" },
+        sh = { "shfmt" },
         systemverilog = { "verible-verilog-format" },
         tex = { "tex-fmt" },
         toml = { "taplo" },
@@ -149,10 +154,12 @@ return {
         xml = { "xmlformat" },
         zsh = { "beautysh" },
       },
-      format_on_save = {
+      default_format_opts = {
         -- Run the LSP formatter first and then run other formatters
         -- This lets us use LSP formatting alongside the injected ones
         lsp_format = "first",
+      },
+      format_on_save = {
         timeout_ms = 500,
       },
     },
