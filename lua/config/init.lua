@@ -38,6 +38,9 @@ vim.o.relativenumber = true
 -- Hide mode since it is already shown in lualine
 vim.o.showmode = false
 
+-- Allow config per directory
+vim.o.exrc = true
+
 -- Use system clipboard
 vim.schedule(function()
   vim.o.clipboard = "unnamedplus"

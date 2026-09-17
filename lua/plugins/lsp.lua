@@ -1,6 +1,10 @@
 local keymaps = require("config.keymaps")
 return {
   {
+    "folke/neoconf.nvim",
+    opts = {},
+  },
+  {
     "mason-org/mason.nvim",
     opts = {},
   },
@@ -232,12 +236,6 @@ return {
     "esmuellert/nvim-eslint",
     opts = {},
   },
-  -- {
-  --   "nvim-neorg/neorg",
-  --   lazy = false, -- Disable lazy loading as some `lazy.nvim` distributions set `lazy = true` by default
-  --   version = "*", -- Pin Neorg to the latest stable release
-  --   config = true,
-  -- },
   {
     "b0o/schemastore.nvim",
   },
