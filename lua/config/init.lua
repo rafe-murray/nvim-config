@@ -93,7 +93,6 @@ end
 
 local default_on_attach = vim.lsp.config["clangd"].on_attach or {}
 vim.lsp.config("clangd", {
-  cmd = { "/opt/homebrew/opt/llvm/bin/clangd" },
   on_attach = function(client, bufnr)
     default_on_attach(client, bufnr)
     vim.keymap.set("n", "<leader>h", function()
